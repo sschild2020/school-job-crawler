@@ -1,0 +1,29 @@
+name: School Job Crawler
+
+on:
+  schedule:
+    # 월~금 한국시간 08:00 ~ 18:00 (매시간 정각 자동 실행)
+    - cron: '0 23,0,1,2,3,4,5,6,7,8,9 * * 0-4'
+  workflow_dispatch: # 수동 즉시 실행 지원
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 환경 구성
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 크롤러 실행
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python crawler.py
